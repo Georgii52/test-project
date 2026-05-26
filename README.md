@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# test-project
 
-## Getting Started
+Монорепо: Hono API + Next.js фронтенд + PostgreSQL
 
-First, run the development server:
+## Stack
+
+- **Hono** — REST API (`apps/backend`, порт 3001)
+- **Next.js 16** — фронтенд, App Router (`apps/frontend`, порт 3000)
+- **Drizzle ORM** — type-safe queries + миграции
+- **PostgreSQL 17** — база данных
+- **TanStack Query** — серверное состояние
+- **shadcn/ui + Tailwind 4** — UI
+- **pnpm workspaces** — монорепо
+
+---
+
+## Запуск через Docker
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+#создать .env
+cp _env.example .env
+#seed для тестового запуска
+pnpm --filter @repo/backend seed
+#compose
+docker compose up --build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Docker поднимает Postgres, прогоняет миграции, затем стартует backend и frontend.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Фронтенд: [http://localhost:3000](http://localhost:3000)
+- API: [http://localhost:3001](http://localhost:3001)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Локальный запуск
 
-To learn more about Next.js, take a look at the following resources:
+**Требования:** Node.js 20+, pnpm, PostgreSQL
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cp _env.example .env
+# отредактировать .env под свою БД
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+pnpm install
 
-## Deploy on Vercel
+# миграции
+pnpm --filter @repo/backend migrate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# запуск обоих сервисов
+pnpm dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Или по отдельности:
+
+```bash
+pnpm dev:api   # только backend
+pnpm dev:web   # только frontend
+```
+
+Seed (заполнить БД тестовыми данными):
+
+```bash
+pnpm --filter @repo/backend seed
+```
+
+---
+
+## Переменные окружения
+
+| Переменная              | Описание                        |
+|-------------------------|---------------------------------|
+| `POSTGRES_NAME`         | Имя базы данных                 |
+| `POSTGRES_USER`         | Пользователь БД                 |
+| `POSTGRES_PASSWORD`     | Пароль БД                       |
+| `POSTGRES_PORT`         | Порт PostgreSQL (default: 5432) |
+| `DATABASE_URL`          | Строка подключения (backend)    |
+| `CORS_ORIGIN`           | Разрешённый origin для CORS     |
+| `PORT`                  | Порт backend (default: 3001)    |
+| `NEXT_PUBLIC_API_URL`   | URL backend для фронтенда       |
+
+Пример для локальной разработки в `_env.example`.

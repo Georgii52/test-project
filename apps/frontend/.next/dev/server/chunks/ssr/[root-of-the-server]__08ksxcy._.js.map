@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///Users/bigboss/VSCode/test-project/apps/frontend/src/components/providers/QueryProvider.tsx"],"sourcesContent":["\"use client\";\n\nimport { QueryClient, QueryClientProvider } from \"@tanstack/react-query\";\nimport { useState } from \"react\";\n\nexport default function QueryProvider({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  const [queryClient] = useState(\n    () =>\n      new QueryClient({\n        defaultOptions: {\n          queries: {\n            staleTime: 60 * 1000,\n          },\n        },\n      }),\n  );\n\n  return (\n    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>\n  );\n}\n"],"names":["QueryProvider","children","queryClient","defaultOptions","queries","staleTime","client"],"mappings":";;;;;AAEA;AAAA;AACA;AAHA;;;;AAKe,SAASA,cAAc,EACpCC,QAAQ,EAGT;IACC,MAAM,CAACC,YAAY,GAAG,IAAA,saAAQ,EAC5B,IACE,IAAI,uQAAW,CAAC;YACdC,gBAAgB;gBACdC,SAAS;oBACPC,WAAW,KAAK;gBAClB;YACF;QACF;IAGJ,qBACE,mcAAC,+SAAmB;QAACC,QAAQJ;kBAAcD;;;;;;AAE/C"}}]
+}

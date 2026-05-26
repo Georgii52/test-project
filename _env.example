@@ -1,0 +1,10 @@
+POSTGRES_NAME=test_db
+POSTGRES_USER=super_safe_login_123
+POSTGRES_PASSWORD=super_safe_password_123
+POSTGRES_PORT=5432
+
+DATABASE_URL=postgres://super_safe_login_123:super_safe_password_123@localhost:5432/test_db
+CORS_ORIGIN=http://localhost:3000
+PORT=3001
+
+NEXT_PUBLIC_API_URL=http://localhost:3001
