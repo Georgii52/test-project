@@ -24,3 +24,9 @@ export const createRoleSchema = z.object({
 });
 
 export type CreateRoleInput = z.infer<typeof createRoleSchema>;
+
+export const createDefaultWorkSchema = z.object({
+  name: z.string().min(1, "Укажите наименование работы"),
+});
+
+export type CreateDefautWorkInput = z.infer<typeof createDefaultWorkSchema>;

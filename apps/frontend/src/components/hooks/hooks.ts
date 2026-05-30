@@ -1,7 +1,13 @@
 "use client";
 
+import { DefaultWork } from "./../../../../backend/src/db/schema";
 import { apiGet, apiPost, apiPatch } from "@/app/lib/data";
-import type { TasksResponse, User, Role } from "@repo/shared";
+import type {
+  TasksResponse,
+  User,
+  Role,
+  CreateDefautWorkInput,
+} from "@repo/shared";
 import type {
   CreateTaskInput,
   UpdateTaskInput,
@@ -51,6 +57,16 @@ export function useRoles() {
   return { data: data?.roles ?? [], isPending, error };
 }
 
+export function useDefaultWorks() {
+  const { data, isPending, error } = useQuery<{ defaultWorks: DefaultWork[] }>({
+    queryKey: ["defaultWorks"],
+    queryFn: () => apiGet("/api/default-works"),
+    retry: retryFn,
+  });
+
+  return { data: data?.defaultWorks ?? [], isPending, error };
+}
+
 export function useTasks({ page, date }: { page: number; date: string }) {
   return useQuery<TasksResponse>({
     queryKey: ["tasks", page, date],
@@ -86,5 +102,12 @@ export function useCreateRole() {
   return useMutate(
     (data: CreateRoleInput) => apiPost("/api/roles", data),
     ["roles"],
+  );
+}
+
+export function useCreateDefaultWork() {
+  return useMutate(
+    (data: CreateDefautWorkInput) => apiPost("/api/default-works", data),
+    ["defaultWorks"],
   );
 }

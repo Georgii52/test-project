@@ -1,5 +1,5 @@
 import { database, pool } from "./index";
-import { rolesTable, usersTable, tasksTable } from "./schema";
+import { rolesTable, usersTable, tasksTable, defaultWorksTable } from "./schema";
 
 const roles = ["Монтажник", "Электрик", "Сантехник", "Прораб"];
 
@@ -11,11 +11,12 @@ const users = [
 ];
 
 const workTypes = [
-  { type: "Укладка кабеля", unit: "м" },
-  { type: "Монтаж розеток", unit: "шт" },
-  { type: "Сварка труб", unit: "шт" },
-  { type: "Заливка стяжки", unit: "м²" },
-  { type: "Штукатурка стен", unit: "м²" },
+  { name: "Укладка кабеля", unit: "м" },
+  { name: "Монтаж розеток", unit: "шт" },
+  { name: "Сварка труб", unit: "шт" },
+  { name: "Заливка стяжки", unit: "м²" },
+  { name: "Штукатурка стен", unit: "м²" },
+  { name: "Монтаж электропроводки", unit: "м" },
 ];
 
 async function seed() {
@@ -38,6 +39,11 @@ async function seed() {
     .onConflictDoNothing()
     .returning();
 
+  await database
+    .insert(defaultWorksTable)
+    .values(workTypes.map(({ name }) => ({ name })))
+    .onConflictDoNothing();
+
   if (insertedUsers.length === 0) {
     console.log("Users already exist, skipping tasks seed.");
     await pool.end();
@@ -49,7 +55,7 @@ async function seed() {
     const executor = insertedUsers[i % insertedUsers.length];
     const doneAt = i % 3 === 0 ? new Date() : null;
     return {
-      workType: work.type,
+      workType: work.name,
       workAmount: Math.floor(Math.random() * 50) + 1,
       workAmountUnit: work.unit,
       executor: executor.id,
@@ -60,7 +66,7 @@ async function seed() {
 
   await database.insert(tasksTable).values(tasks);
 
-  console.log(`Done: ${insertedUsers.length} users, 20 tasks`);
+  console.log(`Done: ${insertedUsers.length} users, 20 tasks, ${workTypes.length} work types`);
   await pool.end();
 }
 

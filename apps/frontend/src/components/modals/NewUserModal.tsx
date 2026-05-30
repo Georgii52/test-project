@@ -125,9 +125,7 @@ export default function NewUserModal() {
               >
                 <SelectTrigger className="w-full">
                   <SelectValue
-                    placeholder={
-                      rolesLoading ? "Загрузка..." : "Выберите роль"
-                    }
+                    placeholder={rolesLoading ? "Загрузка..." : "Выберите роль"}
                   />
                 </SelectTrigger>
                 <SelectContent>

@@ -22,7 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUsers, useCreateTask } from "../hooks/hooks";
+import {
+  useUsers,
+  useCreateTask,
+  useDefaultWorks,
+  useCreateDefaultWork,
+} from "../hooks/hooks";
 import { createTaskSchema } from "@repo/shared";
 import { Plus } from "lucide-react";
 import { UNITS } from "../CONSTANTS";
@@ -37,18 +42,46 @@ export default function NewTaskModal() {
   const [open, setOpen] = useState(false);
   const [unit, setUnit] = useState("");
   const [executor, setExecutor] = useState("");
+  const [defaultWork, setDefaultWork] = useState("");
+  const [newDefaultWork, setNewDefaultWork] = useState("");
+  const [showNewDefaultWork, setShowNewDefaultWork] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors | null>(null);
 
   const { data: users, isPending: usersLoading } = useUsers();
   const { mutate, isPending } = useCreateTask();
+  const {
+    data: defaultWorks,
+    isPending: defaultWorksLoading,
+    error: defaultWorksError,
+  } = useDefaultWorks();
+  const { mutate: createDefaultWork, isPending: workCreating } =
+    useCreateDefaultWork();
 
   function handleOpenChange(next: boolean) {
     if (!next) {
       setUnit("");
+      setShowNewDefaultWork(false);
       setExecutor("");
       setFieldErrors(null);
     }
     setOpen(next);
+  }
+
+  function handleAddWork() {
+    const name = newDefaultWork.trim();
+    if (!name) return;
+
+    createDefaultWork(
+      { name },
+      {
+        onSuccess: (data) => {
+          setDefaultWork((data as { name: string }).name);
+          setNewDefaultWork("");
+          setShowNewDefaultWork(false);
+        },
+        onError: (err) => toast.error(err.message),
+      },
+    );
   }
 
   function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
@@ -56,7 +89,7 @@ export default function NewTaskModal() {
     const form = new FormData(e.currentTarget);
 
     const result = createTaskSchema.safeParse({
-      workType: String(form.get("workType")),
+      workType: defaultWork,
       workAmount: Number(form.get("workAmount")),
       workAmountUnit: unit,
       executor,
@@ -102,12 +135,71 @@ export default function NewTaskModal() {
           <FieldGroup className="gap-5 py-4">
             <Field>
               <Label htmlFor="workType">Наименование работы</Label>
-              <Input
-                id="workType"
-                name="workType"
-                placeholder="напр. Укладка плитки"
-              />
+              <Select
+                value={defaultWork}
+                onValueChange={setDefaultWork}
+                disabled={defaultWorksLoading}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={
+                      defaultWorksLoading
+                        ? "Загрузка..."
+                        : "Выберите наименование"
+                    }
+                  />
+                  <SelectContent>
+                    {defaultWorks.map((item) => (
+                      <SelectItem key={item.id} value={item.name}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </SelectTrigger>
+              </Select>
               <FieldError errors={toErrors(fieldErrors?.workType)} />
+              {!showNewDefaultWork ? (
+                <button
+                  type="button"
+                  className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline cursor-pointer w-fit"
+                  onClick={() => setShowNewDefaultWork(true)}
+                >
+                  + Добавить наименование
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 mt-1">
+                  <Input
+                    value={newDefaultWork}
+                    onChange={(e) => setNewDefaultWork(e.target.value)}
+                    placeholder="Наименование"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddWork();
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={workCreating || !newDefaultWork.trim()}
+                    onClick={handleAddWork}
+                  >
+                    {workCreating ? "..." : "Добавить"}
+                  </Button>
+                  <button
+                    type="button"
+                    className="text-xs text-muted-foreground hover:underline cursor-pointer shrink-0"
+                    onClick={() => {
+                      setShowNewDefaultWork(false);
+                      setNewDefaultWork("");
+                    }}
+                  >
+                    Отмена
+                  </button>
+                </div>
+              )}
             </Field>
             <Field>
               <Label htmlFor="workAmount">Объем работы</Label>
