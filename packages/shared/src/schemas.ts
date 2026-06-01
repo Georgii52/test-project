@@ -9,8 +9,13 @@ export const createTaskSchema = z.object({
 
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 
-export const updateTaskSchema = createTaskSchema;
-export type UpdateTaskInput = CreateTaskInput;
+export const updateTaskSchema = z.object({
+  workAmount: z.number().int().positive("Объём должен быть больше 0"),
+  workAmountUnit: z.string().min(1, "Укажите единицу измерения"),
+  executor: z.uuid("Некорректный исполнитель"),
+});
+
+export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 
 export const createUserSchema = z.object({
   name: z.string().min(1, "Укажите ФИО"),

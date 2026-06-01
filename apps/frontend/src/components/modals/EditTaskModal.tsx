@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/select";
 import { useUsers, useUpdateTask } from "../hooks/hooks";
 import { createTaskSchema } from "@repo/shared";
-import { Pen, Plus } from "lucide-react";
 import { UNITS } from "../CONSTANTS";
 import { z } from "zod";
 import toast from "react-hot-toast";
@@ -36,7 +35,6 @@ type FieldErrors = Partial<
 
 export default function EditTaskModal({ task }: { task: Task }) {
   const [open, setOpen] = useState(false);
-  const [workType, setWorkType] = useState(task.workType);
   const [workAmount, setWorkAmount] = useState(task.workAmount);
   const [workAmountUnit, setWorkAmountUnit] = useState(task.workAmountUnit);
   const [executor, setExecutor] = useState(task.executor.id);
@@ -70,7 +68,7 @@ export default function EditTaskModal({ task }: { task: Task }) {
 
     setFieldErrors(null);
     mutate(
-      { id: task.id, workType, workAmount, workAmountUnit, executor },
+      { id: task.id, workAmount, workAmountUnit, executor },
       {
         onSuccess: () => {
           toast.success("Задача успешно изменена");
@@ -110,8 +108,8 @@ export default function EditTaskModal({ task }: { task: Task }) {
                 id="workType"
                 name="workType"
                 placeholder="напр. Укладка плитки"
-                defaultValue={workType}
-                onChange={(e) => setWorkType(e.target.value)}
+                defaultValue={task.workType}
+                disabled={true}
               />
               <FieldError errors={toErrors(fieldErrors?.workType)} />
             </Field>
