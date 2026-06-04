@@ -1,8 +1,8 @@
 "use client";
 
-import { DefaultWork } from "./../../../../backend/src/db/schema";
 import { apiGet, apiPost, apiPatch } from "@/app/lib/data";
 import type {
+  DefaultWork,
   TasksResponse,
   User,
   Role,
